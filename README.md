@@ -79,7 +79,14 @@ python rag.py
 Then ask anything! Example:
 
 ```
-❓ Ask a question: What are the mandatory procedures for academic proctors?
+
+✅ Example Questions You Can Ask
+"What are the mandatory procedures for academic proctors before, during, and after exams?"
+"How should academic proctors handle student illness during an exam?"
+"What should a proctor do if they suspect a student is cheating?"
+"What are the washroom escorting rules for academic proctors?"
+"What happens if a fire alarm sounds during an exam?"
+"What is the disciplinary procedure for student misconduct?"
 ```
 
 ---
