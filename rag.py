@@ -9,6 +9,7 @@ from langgraph.graph.message import add_messages
 from langchain_community.chat_models import ChatOllama
 from langchain.schema import HumanMessage, AIMessage
 
+
 # ✅ Define the graph state schema
 class State(TypedDict):
     messages: Annotated[list, add_messages]
@@ -46,10 +47,37 @@ Answer:
         "messages": state["messages"] + [AIMessage(content=response)]  # ✅ Proper response format
     }
 
+
+
+def summarizer(state:State)->State:
+    latest_msg=state["messages"][-1]
+    context=latest_msg.content
+    user_message=state["messages"][0].content
+    print(f"---------------------+ user message:{user_message}")
+
+    prompt=f"""
+You are a intelligent assistant which summarizes the most optimized information into points given the 
+Context:
+{context}
+and user question :{user_message}
+Answer:
+ """.strip()
+    
+    response=ask_ollama(prompt)
+    return {
+        "messages":state["messages"]+[AIMessage(content=response)]
+    }
+
 # ✅ Add nodes and edges to the graph
 graph_builder.add_node("infobot", ask)
+graph_builder.add_node("summarybot",summarizer)
+
 graph_builder.add_edge(START, "infobot")
+graph_builder.add_edge("infobot","summarybot")
 graph = graph_builder.compile()
+
+
+
 
 # ✅ Function to stream responses from LangGraph
 def stream_graph_updates(user_input: str):
