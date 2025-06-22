@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+pydantic
+requests
+
+langgraph
+langchain
+langchain-core
+langchain-ollama  # ✅ Correct Ollama package

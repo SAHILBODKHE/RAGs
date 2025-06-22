@@ -1,0 +1,13 @@
+# Vector search and embedding
+llama-index>=0.10.0
+llama-index-llms-ollama
+llama-index-tools-mcp
+langchain-community
+sentence-transformers
+chromadb
+pypdf
+
+# FastAPI app
+fastapi
+uvicorn
+requests

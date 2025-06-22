@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MCP Human Tool UI</title>
+</head>
+<body>
+    <h1>LangGraph MCP Chatbot</h1>
+    <div id="chat" style="border: 1px solid #ccc; padding: 1rem; margin-bottom: 1rem; max-width: 500px;"></div>
+    <input id="userInput" placeholder="Ask a question..." style="width: 300px;" />
+    <button onclick="sendMessage()">Send</button>
+
+    <div id="interrupt" style="display:none; margin-top: 2rem;">
+        <p id="question" style="font-weight: bold;"></p>
+        <input id="correctedName" placeholder="Corrected Name" /><br />
+        <input id="correctedBirthday" placeholder="Corrected Birthday" /><br />
+        <button onclick="submitCorrection()">Submit Correction</button>
+    </div>
+
+    <script>
+        async function sendMessage() {
+            const input = document.getElementById('userInput').value;
+            const response = await fetch('http://localhost:9000/ask', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({message: input})
+            });
+            const result = await response.json();
+            if (result.type === 'bot_response') {
+                document.getElementById('chat').innerHTML += `<p><b>Bot:</b> ${result.data}</p>`;
+            } else if (result.type === 'human_required') {
+                document.getElementById('interrupt').style.display = 'block';
+                document.getElementById('question').innerText = result.data.question;
+            }
+        }
+
+        async function submitCorrection() {
+            const name = document.getElementById('correctedName').value;
+            const birthday = document.getElementById('correctedBirthday').value;
+            const response = await fetch('http://localhost:9000/correction', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({name, birthday})
+            });
+            const result = await response.json();
+            document.getElementById('interrupt').style.display = 'none';
+            document.getElementById('chat').innerHTML += `<p><b>Bot:</b> ${result.data}</p>`;
+        }
+    </script>
+</body>
+</html>
