@@ -1,0 +1,35 @@
+# === RAG Core Stack ===
+langchain>=0.2.0
+langchain-community>=0.0.20
+sentence-transformers>=2.2.2
+chromadb>=0.4.14
+
+# === Embeddings + Transformers ===
+torch>=2.0.0
+transformers>=4.37.0
+
+# === Ollama + LLaMA 3.2 ===
+llama-index
+llama-index-llms-ollama           # for LLaMA via Ollama
+# NOTE: install Ollama system-side from https://ollama.com
+
+# === FastAPI Server (Optional) ===
+fastapi
+uvicorn
+
+# === Graph & Utility Libraries ===
+networkx                          # for schema graph traversal
+regex
+tqdm
+pydantic>=1.10.0
+numpy>=1.24.0
+
+# === File Handling (Optional) ===
+aiofiles
+python-multipart
+jinja2
+requests
+
+# === SQL Validation / Debug (Optional) ===
+sqlparse
+sqlglot
