@@ -1,0 +1,86 @@
+[
+  {
+    "query": "Show my upcoming premium payments due in the next 30 days",
+    "result": {
+      "sql": "SELECT * FROM premium_payments WHERE payment_date >= CURRENT_DATE - INTERVAL 30 DAY AND user_id = 'abc-123';"
+    }
+  },
+  {
+    "query": "List all my dental claims with procedure codes from the last 2 years",
+    "result": {
+      "sql": "SELECT t2.procedure_code FROM claims AS t1 INNER JOIN dental_details AS t2 ON t1.claim_id = t2.claim_id WHERE t1.claim_date >= DATE_SUB(CURRENT_DATE, INTERVAL 2 YEAR) AND t1.user_id = 'abc-123'"
+    }
+  },
+  {
+    "query": "What's my remaining drug coverage limit for this year?",
+    "result": {
+      "sql": "SELECT coverage_limits.remaining_limit \nFROM users \nJOIN coverage_limits ON users.user_id = coverage_limits.user_id\nJOIN policies ON users.user_id = policies.user_id\nJOIN claims ON policies.policy_id = claims.policy_id\nWHERE users.user_id = 'abc-123' AND claims.claim_type = 'drug_coverage';"
+    }
+  },
+  {
+    "query": "Show all claims that are still pending approval",
+    "result": {
+      "sql": "SELECT * FROM claims WHERE status = 'pending_approval' AND user_id = 'abc-123';"
+    }
+  },
+  {
+    "query": "List all hospital visits where the admission was in 2023 but claims weren't submitted until 2024",
+    "error": "'sql'"
+  },
+  {
+    "query": "Show my vision coverage details and used amounts",
+    "result": {
+      "sql": "SELECT \n  cl.columns,\n  cl.foreign_keys,\n  vd.used_amount\nFROM \n  communications_log cl\n  JOIN vision_claims vc ON cl.columns = vc.foreign_keys\n  JOIN coverage_limits vl ON vc.foreign_keys = vl.foreign_keys\n  JOIN user_preferences up ON vl.user_id = up.user_id\nWHERE \n  up.user_id = 'abc-123'"
+    }
+  },
+  {
+    "query": "Find all claims where the approved amount was less than 80% of claimed amount",
+    "error": "'sql'"
+  },
+  {
+    "query": "List my policies that will expire in the next 3 months",
+    "result": {
+      "sql": "SELECT p.policy_name \nFROM policies p \nJOIN coverage_limits cl ON p.policy_id = cl.policy_id\nJOIN premium_payments pp ON cl.coverage_limit_id = pp.coverage_limit_id\nWHERE pp.next_payment_date > NOW() + INTERVAL '3 month' AND pp.user_id = 'abc-123';"
+    }
+  },
+  {
+    "query": "Show my highest value claim in each category (drug, dental, vision, hospital)",
+    "result": {
+      "sql": "SELECT T1.claim_amount, T1.category \nFROM claims AS T1 \nJOIN communications_log AS T2 ON T1.claim_id = T2.claim_id \nWHERE user_id = 'abc-123' AND T1.category IN ('drug', 'dental', 'vision', 'hospital') \nGROUP BY T1.category \nORDER BY T1.claim_amount DESC \nLIMIT 1"
+    }
+  },
+  {
+    "query": "List all communications sent to me about claim denials in the last year",
+    "result": {
+      "sql": "SELECT * FROM communications_log AS CL \nJOIN claims AS C ON CL.claim_id = C.id\nWHERE CL.user_id = 'abc-123'\nAND CL.subject IN ('claim denial', 'denial notification')\nAND EXTRACT(YEAR FROM CL.timestamp) = (EXTRACT(YEAR FROM CURRENT_DATE) - 1);"
+    }
+  },
+  {
+    "query": "Show my monthly premium payment history for my active policies",
+    "error": "'sql'"
+  },
+  {
+    "query": "Find all pre-authorization requests that were approved after the service date",
+    "result": {
+      "sql": "SELECT * FROM pre_authorizations \nJOIN claims ON pre_authorizations.claim_id = claims.id\nJOIN claim_documents ON claims.id = claim_documents.claim_id\nJOIN coverage_limits ON claims.coverage_limit_id = coverage_limits.id\nJOIN policies ON coverage_limits.policy_id = policies.id\nWHERE user_preferences.user_id = 'abc-123'\nAND coverage_limits.service_date < CURRENT_DATE\nAND claim_audit_logs.approval_status = 'approved'"
+    }
+  },
+  {
+    "query": "List claims that were submitted more than 30 days after the service date",
+    "result": {
+      "sql": "SELECT * FROM claims WHERE claim_date > NOW() - INTERVAL 30 DAY AND user_id = 'abc-123';"
+    }
+  },
+  {
+    "query": "Show my provider's plan details including all coverage limits",
+    "result": {
+      "sql": "SELECT plan_name, coverage_limit FROM provider_plans JOIN users ON users.id = provider_plans.user_id WHERE users.user_id = 'abc-123';"
+    }
+  },
+  {
+    "query": "List all documents I've uploaded for claims in the last 6 months",
+    "result": {
+      "sql": "SELECT c.document_name, c.file_size, c.upload_date \nFROM claim_documents c \nJOIN claims cl ON c.claim_id = cl.claim_id\nJOIN users u ON cl.user_id = u.user_id\nWHERE u.user_id = 'abc-123'\nAND EXTRACT(MONTH FROM upload_date) BETWEEN EXTRACT(MONTH FROM CURRENT_DATE - INTERVAL '6 month') AND EXTRACT(MONTH FROM CURRENT_DATE);"
+    }
+  }
+]
